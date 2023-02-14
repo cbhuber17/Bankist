@@ -82,6 +82,20 @@ const displayMovements = function (movements) {
 
 displayMovements(account1.movements);
 
+// Create a property "username" in each account, where the lower case starting
+// letter is the username.
+const createUsernames = function (accs) {
+  accs.forEach(function (acc) {
+    acc.username = acc.owner
+      .toLowerCase()
+      .split(' ')
+      .map(name => name[0])
+      .join('');
+  });
+};
+
+createUsernames(accounts);
+
 /////////////////////////////////////////////////
 /////////////////////////////////////////////////
 // LECTURES
