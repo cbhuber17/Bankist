@@ -1,2 +1,3 @@
 # Bankist
-Array traiing Jonas Schmedtmann's Ultimate Java Course
+
+Array training Jonas Schmedtmann's Ultimate Java Course
