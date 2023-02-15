@@ -96,6 +96,14 @@ const createUsernames = function (accs) {
 
 createUsernames(accounts);
 
+// Display the balance as the sum (accumulations) of the money movements.
+const calcDisplayBalance = function (movements) {
+  const balance = movements.reduce((acc, mov) => acc + mov, 0); // Initial value of 0, start accumulating
+  labelBalance.textContent = `${balance} EUR`;
+};
+
+calcDisplayBalance(account1.movements);
+
 /////////////////////////////////////////////////
 /////////////////////////////////////////////////
 // LECTURES
