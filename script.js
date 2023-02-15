@@ -61,6 +61,9 @@ const inputLoanAmount = document.querySelector('.form__input--loan-amount');
 const inputCloseUsername = document.querySelector('.form__input--user');
 const inputClosePin = document.querySelector('.form__input--pin');
 
+// -------------------------------------------------------------------------
+
+// Display the money movements (in/out)
 const displayMovements = function (movements) {
   containerMovements.innerHTML = '';
 
@@ -72,7 +75,7 @@ const displayMovements = function (movements) {
           <div class="movements__type movements__type--${type}">${
       i + 1
     } ${type}</div>
-          <div class="movements__value">${mov}</div>
+          <div class="movements__value">${mov}€</div>
         </div>
     `;
 
@@ -80,7 +83,7 @@ const displayMovements = function (movements) {
   });
 };
 
-displayMovements(account1.movements);
+// -------------------------------------------------------------------------
 
 // Create a property "username" in each account, where the lower case starting
 // letter is the username.
@@ -96,13 +99,81 @@ const createUsernames = function (accs) {
 
 createUsernames(accounts);
 
+// -------------------------------------------------------------------------
+
 // Display the balance as the sum (accumulations) of the money movements.
 const calcDisplayBalance = function (movements) {
   const balance = movements.reduce((acc, mov) => acc + mov, 0); // Initial value of 0, start accumulating
-  labelBalance.textContent = `${balance} EUR`;
+  labelBalance.textContent = `${balance}€`;
 };
 
-calcDisplayBalance(account1.movements);
+// -------------------------------------------------------------------------
+
+// Display the summary of money in/out
+const calcDisplaySummary = function (acc) {
+  // In
+  const incomes = acc.movements
+    .filter(mov => mov > 0)
+    .reduce((acc, mov) => acc + mov, 0);
+
+  labelSumIn.textContent = `${incomes}€`;
+
+  // Out
+  const out = acc.movements
+    .filter(mov => mov < 0)
+    .reduce((acc, mov) => acc + mov, 0);
+
+  labelSumOut.textContent = `${Math.abs(out)}€`;
+
+  // Interest
+  const interest = acc.movements
+    .filter(mov => mov > 0)
+    .map(deposit => (deposit * acc.interestRate) / 100)
+    .filter(int => int >= 1)
+    .reduce((acc, int) => acc + int, 0);
+
+  labelSumInterest.textContent = `${interest}€`;
+};
+
+// -------------------------------------------------------------------------
+
+let currentAccount;
+
+// Event handler
+btnLogin.addEventListener('click', function (e) {
+  // Prevent form from submitting
+  e.preventDefault();
+
+  currentAccount = accounts.find(
+    acc => acc.username === inputLoginUsername.value
+  );
+  // Check if current account exists
+  // Same as (currentAccount && ... )
+  if (currentAccount?.pin === Number(inputLoginPin.value)) {
+    // Display UI and message
+    labelWelcome.textContent = `Welcome back, ${
+      currentAccount.owner.split(' ')[0]
+    }`;
+
+    containerApp.style.opacity = 100;
+
+    // Clear input fields
+    inputLoginUsername.value = inputLoginPin.value = '';
+
+    inputLoginPin.blur();
+
+    // Display movements
+    displayMovements(currentAccount.movements);
+
+    // Display balance
+    calcDisplayBalance(currentAccount.movements);
+
+    // Display summary
+    calcDisplaySummary(currentAccount);
+  }
+});
+
+// -------------------------------------------------------------------------
 
 /////////////////////////////////////////////////
 /////////////////////////////////////////////////
