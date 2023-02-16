@@ -102,9 +102,9 @@ createUsernames(accounts);
 // -------------------------------------------------------------------------
 
 // Display the balance as the sum (accumulations) of the money movements.
-const calcDisplayBalance = function (movements) {
-  const balance = movements.reduce((acc, mov) => acc + mov, 0); // Initial value of 0, start accumulating
-  labelBalance.textContent = `${balance}€`;
+const calcDisplayBalance = function (acc) {
+  acc.balance = acc.movements.reduce((acc, mov) => acc + mov, 0); // Initial value of 0, start accumulating
+  labelBalance.textContent = `${acc.balance}€`;
 };
 
 // -------------------------------------------------------------------------
@@ -162,14 +162,46 @@ btnLogin.addEventListener('click', function (e) {
 
     inputLoginPin.blur();
 
-    // Display movements
-    displayMovements(currentAccount.movements);
+    updateUI(currentAccount);
+  }
+});
 
-    // Display balance
-    calcDisplayBalance(currentAccount.movements);
+// -------------------------------------------------------------------------
+const updateUI = function (acc) {
+  // Display movements
+  displayMovements(acc.movements);
 
-    // Display summary
-    calcDisplaySummary(currentAccount);
+  // Display balance
+  calcDisplayBalance(acc);
+
+  // Display summary
+  calcDisplaySummary(acc);
+};
+
+// -------------------------------------------------------------------------
+
+btnTransfer.addEventListener('click', function (e) {
+  e.preventDefault();
+
+  const amount = Number(inputTransferAmount.value);
+
+  const receiverAcc = accounts.find(
+    acc => acc.username === inputTransferTo.value
+  );
+
+  inputTransferAmount.value = inputTransferTo.value = '';
+
+  if (
+    amount > 0 && // Positive amount
+    receiverAcc && // Account exists
+    currentAccount.balance >= amount && // Need enough in the account
+    receiverAcc?.username !== currentAccount.username // Can't transfer to yourself
+  ) {
+    // Do the transfer
+    currentAccount.movements.push(-amount);
+    receiverAcc.movements.push(amount);
+
+    updateUI(currentAccount);
   }
 });
 
